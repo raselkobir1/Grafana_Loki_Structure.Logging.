@@ -23,6 +23,13 @@ namespace GrafanaLoki.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            var currentDate = DateTime.UtcNow;
+            var zones = TimeZoneInfo.GetSystemTimeZones();
+            var localZone = TimeZoneInfo.Local.Id;
+            var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;
+            var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);
+            var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
+
             Log.Information("This is test Log 12");
             _logger.LogInformation("creating customer details 12..");
             _logger.LogInformation("creating product details 12..");
