@@ -22,6 +22,7 @@ namespace GrafanaLoki.Controllers
             var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;  
             var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);  
             var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
+            _logger.LogInformation("MyController test executed at {date}", DateTime.UtcNow);
 
             _logger.LogInformation("Laki and graphana log test");
             return Ok();
