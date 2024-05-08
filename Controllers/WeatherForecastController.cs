@@ -23,14 +23,20 @@ namespace GrafanaLoki.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            var currentDate = DateTime.UtcNow;
-            var zones = TimeZoneInfo.GetSystemTimeZones();
-            var localZone = TimeZoneInfo.Local.Id;
-            var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;
-            var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);
-            var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
             try
             {
+                var currentDate = DateTime.UtcNow;
+                var zones = TimeZoneInfo.GetSystemTimeZones();
+                var localZone = TimeZoneInfo.Local.Id;
+                var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;
+                var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);
+                var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
+                _logger.LogInformation("MyController test executed at {date}", DateTime.UtcNow);
+
+                Log.Information("This is test Log 001");
+                _logger.LogInformation("creating customer details 002");
+                _logger.LogError("elasticsearch error creating instance error 003");
+
                 throw new Exception("exception from my application" + "weatherForcostController");
             }
             catch (Exception ex)
@@ -38,10 +44,6 @@ namespace GrafanaLoki.Controllers
                 _logger.LogError(ex,"something went wrong. Please check");
             }
 
-            Log.Information("This is test Log 12");
-            _logger.LogInformation("creating customer details 12..");
-            _logger.LogInformation("creating product details 12..");
-            _logger.LogError("creating instance error 12");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

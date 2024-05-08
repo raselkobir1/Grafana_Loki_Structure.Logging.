@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace GrafanaLoki.Controllers
 {
@@ -16,24 +17,30 @@ namespace GrafanaLoki.Controllers
         [HttpGet("logs")]
         public IActionResult GraphanaAndLaki()
         {
-            var currentDate = DateTime.UtcNow;
-            var zones = TimeZoneInfo.GetSystemTimeZones();
-            var localZone = TimeZoneInfo.Local.Id; 
-            var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;  
-            var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);  
-            var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
-            _logger.LogInformation("MyController test executed at {date}", DateTime.UtcNow);
+
 
             try
             {
+                // working with date time.
+                var currentDate = DateTime.UtcNow;
+                var zones = TimeZoneInfo.GetSystemTimeZones();
+                var localZone = TimeZoneInfo.Local.Id;
+                var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;
+                var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);
+                var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
+
+                _logger.LogInformation("MyController test executed at {date}", DateTime.UtcNow);
+                Log.Information("This is test Log 001");
+                _logger.LogInformation("creating customer details 002");
+                _logger.LogError("elasticsearch error creating instance error 003");
+                _logger.LogInformation("Laki and graphana log test");
+
                 throw new Exception("exception from my application" + "GraphanaLoki Controller");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "something went wrong. Please check");
             }
-
-            _logger.LogInformation("Laki and graphana log test");
             return Ok();
         }
     }
