@@ -72,6 +72,7 @@ static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configur
 {
     //elasticsearch video tutorial.
     //https://www.youtube.com/watch?v=zp6A5QCW_II 
+    // https://www.humankode.com/asp-net-core/logging-with-elasticsearch-kibana-asp-net-core-and-docker/
     var x = new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
     {
         AutoRegisterTemplate = true,
