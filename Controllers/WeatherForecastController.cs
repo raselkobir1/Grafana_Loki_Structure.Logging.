@@ -29,6 +29,14 @@ namespace GrafanaLoki.Controllers
             var offSet1 = TimeZoneInfo.Local.BaseUtcOffset;
             var offSet = TimeZoneInfo.Local.GetUtcOffset(currentDate);
             var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
+            try
+            {
+                throw new Exception("exception from my application" + "weatherForcostController");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"something went wrong. Please check");
+            }
 
             Log.Information("This is test Log 12");
             _logger.LogInformation("creating customer details 12..");

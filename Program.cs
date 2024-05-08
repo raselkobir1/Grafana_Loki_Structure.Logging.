@@ -1,7 +1,13 @@
+using Elasticsearch.Net;
 using Serilog;
+using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.Loki;
+using System.Net.Sockets;
+using System;
 using System.Reflection;
+using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
@@ -51,6 +57,7 @@ void ConfigureLogging()
 
     Log.Logger = new LoggerConfiguration()
         .Enrich.FromLogContext()
+        .Enrich.WithExceptionDetails()
         .Enrich.WithMachineName()
         .WriteTo.Debug()
         .WriteTo.Console()
@@ -64,7 +71,49 @@ static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configur
     var x = new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
     {
         AutoRegisterTemplate = true,
-        IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
+        IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+        NumberOfReplicas = 1 ,
+        NumberOfShards = 2 ,
     };
     return x;
 }
+
+#region Elasticsearch kibana docker-compose.yml file.
+//version: '3.1'
+
+//services:
+//elasticsearch:
+//container_name: elasticsearch
+//image: docker.elastic.co / elasticsearch / elasticsearch:7.9.2
+//   ports:
+//-9200:9200
+//   volumes:
+//-elasticsearch - data:/ usr / share / elasticsearch / data
+//   environment:
+//-xpack.monitoring.enabled = true
+//- xpack.watcher.enabled = false
+//- "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+//- discovery.type = single - node
+//   networks:
+//-elastic
+
+//  kibana:
+//container_name: kibana
+//image: docker.elastic.co / kibana / kibana:7.9.2
+//   ports:
+//-5601:5601
+//   depends_on:
+//-elasticsearch
+//   environment:
+//-ELASTICSEARCH_URL = http://localhost:9200
+//   networks:
+//-elastic
+
+
+//networks:
+//elastic:
+//driver: bridge
+
+//volumes:
+//  elasticsearch - data:
+#endregion

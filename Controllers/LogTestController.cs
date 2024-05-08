@@ -24,6 +24,15 @@ namespace GrafanaLoki.Controllers
             var localTime = TimeZoneInfo.FindSystemTimeZoneById(localZone);
             _logger.LogInformation("MyController test executed at {date}", DateTime.UtcNow);
 
+            try
+            {
+                throw new Exception("exception from my application" + "GraphanaLoki Controller");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "something went wrong. Please check");
+            }
+
             _logger.LogInformation("Laki and graphana log test");
             return Ok();
         }
