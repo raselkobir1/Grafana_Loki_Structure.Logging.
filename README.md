@@ -11,6 +11,7 @@ viii) Global error handling middleware.
 ix) Serilog setup.
 x) Utilities common return methods
 xi) elasticsearch, kibana
+
 #Resource flow for elasticsearch kibana:
-https://www.humankode.com/asp-net-core/logging-with-elasticsearch-kibana-asp-net-core-and-docker/
-https://www.youtube.com/watch?v=zp6A5QCW_II
+i) https://www.humankode.com/asp-net-core/logging-with-elasticsearch-kibana-asp-net-core-and-docker/
+ii) https://www.youtube.com/watch?v=zp6A5QCW_II
