@@ -10,3 +10,4 @@ vii) Then click Explore tab and browing log if any.
 viii) Global error handling middleware.
 ix) Serilog setup.
 x) Utilities common return methods
+xi) elasticsearch, kibana
