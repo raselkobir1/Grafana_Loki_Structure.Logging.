@@ -1,13 +1,10 @@
-using Elasticsearch.Net;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
-using Serilog.Sinks.Loki;
-using System.Net.Sockets;
-using System;
 using System.Reflection;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Quartz;
+using Quartz.AspNetCore;
+using GrafanaLoki.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
@@ -28,9 +25,34 @@ Serilog.Debugging.SelfLog.Enable(Console.Error);
 //        .WriteTo.LokiHttp(credentials)
 //        .CreateLogger();
 
+builder.Services.AddQuartz(q =>
+{
+    // base Quartz scheduler, job and trigger configuration
+    var jobKey = new JobKey("SendEmailJob");
+    q.AddJob<SendEmailJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("SendEmailJob-trigger")
+        //.WithCronSchedule("0 0 0 * * ?")    // Cron expression for every day at midnight
+        //.WithCronSchedule("0 59 23 * * ?") // Cron expression for every day at 11:59 PM
+        .WithSimpleSchedule(x => x
+                    .WithIntervalInSeconds(5) // run every 5 second indefinitely
+                    .RepeatForever()) 
+    );
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+// ASP.NET Core hosting
+//builder.Services.AddQuartzServer(options =>
+//{
+//    // when shutting down we want jobs to complete gracefully
+//    options.WaitForJobsToComplete = true;
+//});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,7 +70,7 @@ app.Run();
 
 void ConfigureLogging()
 {
-    var credentials = new BasicAuthCredentials("http://localhost:3100", "admin", "Admin@123"); // Address to local or remote Loki server
+    //var credentials = new BasicAuthCredentials("http://localhost:3100", "admin", "Admin@123"); // Address to local or remote Loki server
     var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
     var configuration = new ConfigurationBuilder()
         .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -63,7 +85,7 @@ void ConfigureLogging()
         .WriteTo.Debug()
         .WriteTo.Console()
         .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
-        .WriteTo.LokiHttp(credentials)
+        //.WriteTo.LokiHttp(credentials)
         .Enrich.WithProperty("Environment", environment)
         .ReadFrom.Configuration(configuration)
         .CreateLogger();
