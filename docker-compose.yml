@@ -55,6 +55,21 @@ services:
     - ELASTICSEARCH_URL=http://localhost:9200
    networks:
     - elastic
+
+  apm-server:
+    container_name: apm-server
+    image: docker.elastic.co/apm/apm-server:7.9.2
+    depends_on:
+      - elasticsearch
+      - kibana
+    ports:
+      - 8200:8200
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - KIBANA_HOST=http://kibana:5601
+    networks:
+      - elastic
+
 volumes:
     loki_data:
     grafana_data:

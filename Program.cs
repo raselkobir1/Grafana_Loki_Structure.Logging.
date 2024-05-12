@@ -5,6 +5,8 @@ using System.Reflection;
 using Quartz;
 using Quartz.AspNetCore;
 using GrafanaLoki.Jobs;
+using Elastic.Apm.NetCoreAll;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
@@ -28,14 +30,16 @@ Serilog.Debugging.SelfLog.Enable(Console.Error);
 builder.Services.AddQuartz(q =>
 {
     // base Quartz scheduler, job and trigger configuration
+    var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Bangladesh Standard Time");
     var jobKey = new JobKey("SendEmailJob");
+
     q.AddJob<SendEmailJob>(opts => opts.WithIdentity(jobKey));
 
     q.AddTrigger(opts => opts
         .ForJob(jobKey)
         .WithIdentity("SendEmailJob-trigger")
-        //.WithCronSchedule("0 0 0 * * ?")    // Cron expression for every day at midnight
-        //.WithCronSchedule("0 59 23 * * ?") // Cron expression for every day at 11:59 PM
+        .WithCronSchedule("0 0 0 * * ?", x => x.InTimeZone(timeZoneInfo))    // Cron expression for every day at midnight
+        //.WithCronSchedule("0 59 23 * * ?", x => x.InTimeZone(timeZoneInfo)) // Cron expression for every day at 11:59 PM
         .WithSimpleSchedule(x => x
                     .WithIntervalInSeconds(5) // run every 5 second indefinitely
                     .RepeatForever()) 
@@ -58,6 +62,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseAllElasticApm(builder.Configuration);
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();

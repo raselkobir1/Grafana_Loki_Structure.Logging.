@@ -13,7 +13,7 @@ namespace GrafanaLoki.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             // your business logic here
-            _logger.LogInformation("========================= This is my Test job started at {0}================================", DateTime.Now);
+            _logger.LogInformation("========================= This is my Test Background job started at {0}================================", DateTime.Now);
             await Console.Out.WriteLineAsync("Executing background job");
         }
     }
