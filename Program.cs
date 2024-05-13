@@ -38,7 +38,8 @@ builder.Services.AddQuartz(q =>
     q.AddTrigger(opts => opts
         .ForJob(jobKey)
         .WithIdentity("SendEmailJob-trigger")
-        .WithCronSchedule("0 0 0 * * ?", x => x.InTimeZone(timeZoneInfo))    // Cron expression for every day at midnight
+        .StartNow()
+        //.WithCronSchedule("0 0 0 * * ?", x => x.InTimeZone(timeZoneInfo))    // Cron expression for every day at midnight
         //.WithCronSchedule("0 59 23 * * ?", x => x.InTimeZone(timeZoneInfo)) // Cron expression for every day at 11:59 PM
         .WithSimpleSchedule(x => x
                     .WithIntervalInSeconds(5) // run every 5 second indefinitely
