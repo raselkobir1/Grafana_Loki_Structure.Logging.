@@ -29,24 +29,21 @@ Serilog.Debugging.SelfLog.Enable(Console.Error);
 
 builder.Services.AddQuartz(q =>
 {
-    // base Quartz scheduler, job and trigger configuration
     var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Bangladesh Standard Time");
-    var jobKey = new JobKey("SendEmailJob");
+    var jobKey = new JobKey("job1");
 
     q.AddJob<SendEmailJob>(opts => opts.WithIdentity(jobKey));
-
     q.AddTrigger(opts => opts
         .ForJob(jobKey)
-        .WithIdentity("SendEmailJob-trigger")
+        .WithIdentity("trigger1")
+        .WithCronSchedule("0 * * * * ?", x =>     // Run Every single minute.
+        //.WithCronSchedule("0 0 0 * * ?", x =>   // Run Every day at midnight (00:00:00).
+        {
+            x.InTimeZone(timeZoneInfo);
+        })
         .StartNow()
-        //.WithCronSchedule("0 0 0 * * ?", x => x.InTimeZone(timeZoneInfo))    // Cron expression for every day at midnight
-        //.WithCronSchedule("0 59 23 * * ?", x => x.InTimeZone(timeZoneInfo)) // Cron expression for every day at 11:59 PM
-        .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(5) // run every 5 second indefinitely
-                    .RepeatForever()) 
     );
 });
-
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 // ASP.NET Core hosting
